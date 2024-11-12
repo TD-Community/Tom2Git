@@ -334,7 +334,6 @@ Tom2Git has been tested on a limited range of systems with different TOM databas
 ## Contributing
 
 If you find this project helpful and would like to improve it, contributions are very welcome. Any assistance, including pull requests, is appreciated.  
-This is initially started as a personal project which will be quite useful for the TD community. 
 
 If you’d like to become an official contributor, please contact me to be added to the project.
 
