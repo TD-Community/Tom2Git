@@ -1,0 +1,21 @@
+{BLOBID}		-> TOM file blob ID
+{CURRENTDATETIME}	-> SalDateToStr using SalDateCurrent
+{DATABASE}		-> TOM database name at time of export
+{DESCRIPTION}		-> Description text of original checkin
+{FILEPATH}		-> Filefolder + filename
+{FILESIZE}		-> File size (uncompressed)
+{FILE}			-> Filename
+{ISCOMPRESSED}		-> TOM file compression
+{LABEL}			-> Label text of original checkin
+{MODIFIEDBY}		-> TOM member code of checkin
+{MODIFIEDBYNAME}	-> TOM member name of checkin
+{MODIFIEDDATETIME}	-> SalDateToStr using original checkin datetime
+{MODULEID}		-> TOM File Module ID
+{ORIGINALFILEDATETIME}	-> The file timestamp of original checkin
+{PATH}			-> Filefolder
+{PROJECTCODE}		-> TOM project code
+{PROJECTNAME}		-> TOM project name
+{PROJECTPATH}		-> TOM project path
+{REVISIONNUMBER}	-> TOM file revision number
+{SOURCEID}		-> TOM file source ID
+{STORAGEMETHOD}		-> TOM file storage method F or D

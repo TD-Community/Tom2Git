@@ -1,0 +1,5 @@
+Tom2Git export: {CURRENTDATETIME}
+TOM project: {DATABASE}/{PROJECTCODE}
+File: {FILE}
+Label: {LABEL}
+Description: {DESCRIPTION}
