@@ -10,6 +10,8 @@ The result is a Git repository that mirrors the original TOM repository, preserv
 
 Tom2Git is developed using Team Developer 7.5, and the release package includes the required TD runtime.
 
+![Screenshot of the application](Documentation/Tom2Git_MainScreen.png)
+
 ## Why Convert from TOM to Git?
 
 Many organizations are adopting Git as the standard for version control due to its advanced features, widespread adoption, and integration across development tools. Several motivations drive the conversion from TOM to Git:
