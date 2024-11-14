@@ -10864,7 +10864,6 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 					Else
 						Call SalSetFocus( pbOk )
 					Call SalCenterWindow( hWndForm )
-					Call SalSetDefButton( pbOk )
 			Function: Login
 				Description: void Login( )
 						Execute login
@@ -10924,6 +10923,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 				Actions
 					If dfDatabase AND dfUser AND dfPassword
 						Call SalEnableWindow( pbOk )
+						Call SalSetDefButton( pbOk )
 					Else
 						Call SalDisableWindow( pbOk )
 		Window Parameters
