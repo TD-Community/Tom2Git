@@ -278,7 +278,9 @@ After configuring all settings, click **Export** to begin processing the selecte
 
 When the given Workfolder already contains files and subfolders the validation will fail in the case of polyrepo. When using monorepo and the Workfolder is already am existing Git repository, the validation will succeed. Only monorepo exports are able to be added to existing Git repo's.
 
-Following validation, an overview screen appears, showing the selected TOM projects and any set snapshots, which can still be adjusted at this stage.
+Following validation, an overview screen appears, showing the selected TOM projects and any set snapshots, which can still be adjusted at this stage.  
+The **Dry run** option performs all extraction actions without creating a Git repository or executing any Git commands. Use this option to verify that the TOM project history can be extracted without issues for the selected projects.
+Since this approach is significantly faster, it is recommended to perform a dry run first to verify the valid state of TOM revision history. If no issues are encountered, proceed with the full export with Git actions enabled.
 
 Click **Start Export** to initiate the actual export process. During export, a **CANCEL** button is available to abort if needed.
 
@@ -305,7 +307,7 @@ Also **TDAppTools** is included which makes it possible to debug database access
 ### Tom2Git.cfg
 When using Tom2Git, many settings within the application are saved to `Tom2Git.cfg` file, next to the main executable. Subsequent running of Tom2Git will load the previously set options. To reset the options, delete the file.
 
-## Troubleshooting, limitations and requirements
+## Troubleshooting, limitations, requirements and remarks
 
 - **Connection Fails**: Ensure you have the necessary permissions to access the TOM database and that your system meets all prerequisites. First, test TOM on the same system where Tom2Git will run, using the same `sql.ini` configuration for Tom2Git to connect correctly.
 - **Export Errors**: Export issues often arise due to corrupted TOM files in the database or missing file storage. Check TOM and attempt to extract any problematic files directly. If TOM cannot extract these files, Tom2Git will encounter the same issue.
@@ -313,6 +315,7 @@ When using Tom2Git, many settings within the application are saved to `Tom2Git.c
 - **Data Verification**: After export, carefully review the Git commit history to confirm that all check-in data (user, date, labels) has been accurately converted. Tom2Git does not guarantee complete accuracy, so thorough verification is essential before deprecating TOM. It is the user’s responsibility to ensure the export produced a complete and usable Git repository.
 - **Single/Multi-user database**: When TOM is used on a single user database (like single-user SqlBase provided with TD), be sure not to run TOM and Tom2Git at the same time. Tom2Git will connect and stay connected to the database which may block TOM to be started and visa versa. Also make sure that no changes are performed in the TOM database during export and usage of Tom2Git. This may lead to issues.
 - **Read only access**: Tom2Git only reads data from the TOM database and does not change any data. It may block actions from other TOM instances used on the database so be sure to run Tom2Git only when no other users are connected.
+- **Performance**: The export or snapshot process may take considerable time due to various factors, including the TOM repository's revision history, database access speed, file storage access, file sizes, and file properties (such as delta or compression). Additionally, Git actions like git add and git commit can impact overall performance. 
 
 ## Tom2Git project and development
 
