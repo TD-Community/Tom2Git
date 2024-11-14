@@ -1,6 +1,9 @@
 Application Description: Tom2Git - Export TOM repository projects to GIT.
 		
-		Version: 1.0.0
+		GitHub:
+		https://github.com/TD-Community/Tom2Git
+		
+		Version: 1.0.1
 	Outline Version - 4.0.59
 	Design-time Settings
 .data DT_MAKERUNDLG
@@ -388,7 +391,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 				Number: ncTOM2GIT_LOGMODE_FULL	= 0		! Full trace to log during exports
 				Number: ncTOM2GIT_LOGMODE_ERRORS	= 1		! Only trace errors to log during exports
 				!
-				String: scTOM2GIT_VERSION	= "1.0.0"
+				String: scTOM2GIT_VERSION		= "1.0.1"
 				String: scREG_COMPANY		= "TDCommunity"
 				String: scREG_APPLICATION		= "Tom2Git"
 				String: scREG_KEY			= "Tom2Git"
@@ -413,12 +416,18 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 				String: scTAB			= "	"
 				String: scNEWLINE			= "
 						"
+				!
+				Number: ncSIG_RESET_INIT		= 0
+				Number: ncSIG_CODE2NAME		= 1
+				Number: ncSIG_FORCE_EMAIL		= 2
+				Number: ncSIG_CODE2EMAIL		= 3
+				Number: ncSIG_NAME2EMAIL		= 4
 			Enumerations
 		Resources
 		Variables
-.data RESOURCE 0 0 1 2622281830
+.data RESOURCE 0 0 1 1933526314
 0000: 2200000022000000 0000000000000000 0000010000000C00 0000190000000001
-0020: 8601AD0000000000 AA9FE89F2C07F200 00000000
+0020: 4A10AD0000000000 6FEC489DC709F200 00000000
 .enddata
 			FunctionalVar: guGlobals
 				Class: cfcTMGlobals
@@ -742,15 +751,15 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 		Named Toolbars
 		Named Menus
 		Class Definitions
-.data RESOURCE 0 0 1 3867066991
-0000: 2E010000DF000000 0000000000000000 0200000200FFFF01 00160000436C6173
+.data RESOURCE 0 0 1 4262418261
+0000: 2E010000E0000000 0000000000000000 0200000200FFFF01 00160000436C6173
 0020: 73566172004F7574 6C696E6552006567 496E666F19003C00 00FFFE00FF0C6300
 0040: 66006300004C0069 0062004700026974 0032005400004400 2200000001003C00
-0060: 0019000500018601 AD000C0000AA9F28 A1C02C0705000000 0001807D00000001
+0060: 0019000500014A10 AD000C00006FEC08 9EC0C70905000000 0001807D00000001
 0080: 001900FF0D630080 5200610064006938 6F004C7300227442 006F7800409A0000
-00A0: 000500006F190079 018600FBAAB00600 0000195900190001 DF003EAA07002C00
-00C0: 00320000D6190001 B700AA0F08000000 834B00000019F500 01ED00AAC3090000
-00E0: 006264000019007D 0100FBAA300A0000 00
+00A0: 000500006F190079 014A00F36FECB006 0000001959001900 01DF003E6F07002C
+00C0: 0000320000D61900 01B7006F0F080000 00834B00000019F5 0001ED006FC30900
+00E0: 0000626400001900 7D0100FB6F300A00 0000
 .enddata
 			Functional Class: cfcTMGlobals
 				Description: Global singleton class to hold general data and settings
@@ -1165,6 +1174,9 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 						Local variables
 							FunctionalVar: uGit
 								Class: cfcLibGit2TDExt
+							FunctionalVar: uSettings
+								Class: cfcTMSettings
+							String: sGitRepoPath
 							Number: nCount
 							Number: nCountRevision
 							Number: nRepoPtr
@@ -1173,18 +1185,15 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 							Number: nRevisionIndex
 							Number: nProjectIndexNext
 							Number: nRevisionIndexNext
-							String: sGitRepoPath
-							FunctionalVar: uSettings
-								Class: cfcTMSettings
 							Boolean: bNeedsCommit
 							Boolean: bOk
 							Boolean: bHasErrors
 							Boolean: bIsExistingRepo
 						Actions
+							Call guGlobals.TraceStart( )
 							Call guGlobals.Trace( EVENT_INFORMATION, "Start Export TOM to GIT" )
 							Call __ResetSnapshots( )
 							!
-							Call guGlobals.TraceStart( )
 							Set bOk = guGlobals.bivDryRun OR uGit.GIT_libgit2_init( nRet )
 							If bOk
 								If guGlobals.bivDryRun
@@ -1234,6 +1243,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 													Press OK to continue exporting to the repository", "Pause after GIT INIT", MB_Ok | MB_IconInformation )
 										Call uSettings.LoadMessageText( )
 										Call PALPathAddBackslash( sGitRepoPath )
+										!
 										Set nCount = 0
 										While nCount < uivHistorySort.nivTotal AND guGlobals.DoContinue(  )
 											Call uivHistorySort.GetRevInfo( nCount, nProjectIndex, nRevisionIndex )
@@ -1266,6 +1276,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 								Else
 									Call guGlobals.Trace( EVENT_INFORMATION, "Destination: POLYREPO" )
 									Call guGlobals.StartProgress( GetSelectedProjectsRevisions(  ) )
+									!
 									Set nCount = 0
 									While nCount < nivTotalProjects AND guGlobals.DoContinue(  )
 										If uaivProject[nCount].bivIsSelected
@@ -1296,6 +1307,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 															Press OK to continue exporting to the repository", "Pause after GIT INIT", MB_Ok | MB_IconInformation )
 												Call uSettings.LoadMessageText( )
 												Call PALPathAddBackslash( sGitRepoPath )
+												!
 												Set nCountRevision = 0
 												While nCountRevision < uaivProject[nCount].nivTotalRevisions AND guGlobals.DoContinue(  )
 													If uaivProject[nCount].dtivSnapshotDate AND uaivProject[nCount].bivSnapshotModeEnabled
@@ -1321,6 +1333,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 												If NOT guGlobals.bivDryRun
 													Call uGit.GIT_repository_free( nRepoPtr )
 											Else
+												Set bHasErrors = TRUE
 												If guGlobals.bivDryRun
 													Call guGlobals.Trace( EVENT_ERROR, "Doing a dry run failed" )
 												Else
@@ -1330,6 +1343,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 								If NOT guGlobals.bivDryRun
 									Call uGit.GIT_libgit2_shutdown(  )
 							Else
+								Set bHasErrors = TRUE
 								If guGlobals.bivDryRun
 									Call guGlobals.Trace( EVENT_ERROR, "Doing a dry run failed" )
 								Else
@@ -1358,14 +1372,16 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 								Class: cfcTMSettings
 							Boolean: bHasErrors
 						Actions
+							Call guGlobals.TraceStart( )
+							Call guGlobals.Trace( EVENT_INFORMATION, "Start creating snapshot" )
 							Call __ResetSnapshots( )
 							!
-							Call guGlobals.TraceStart( )
 							Call guGlobals.GetSettings( uSettings )
 							If guGlobals.GetDestination(  ) = ncTOM2GIT_DEST_MONO
 								Call CreateSortObject(  )
 								Set sGitRepoPath = guGlobals.GetWorkFolder(  )
 								Call PALPathAddBackslash( sGitRepoPath )
+								!
 								Set nCount = 0
 								While nCount < uivHistorySort.nivTotal AND guGlobals.DoContinue(  )
 									Call uivHistorySort.GetRevInfo( nCount, nProjectIndex, nRevisionIndex )
@@ -1414,12 +1430,8 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 							Number: nRet
 							Number: nCount
 							Number: nDummy
-							String: saFolder[*]
-							String: sDuplicateFolderErrMsg
 							String: sExistsFolderErrMsg
-							Number: nTotalFolders
 							Number: nItems
-							String: sFolder
 							String: sMsgText
 							String: sSignatureMsg
 							String: saItems[*]
@@ -1834,7 +1846,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 						Description:
 						Returns
 						Parameters
-							Number: pnMode		! 0=reset all/initial, 1=CodeToName, 2=force email, 3=code2email, 4=name 2 email
+							Number: pnMode
 							String: psBaseEmail
 						Static Variables
 						Local variables
@@ -1968,7 +1980,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 								If SqlPrepareAndExecute( guGlobals.GetSqlHandle(  ), sSql )
 									While SqlFetchNext( guGlobals.GetSqlHandle(  ), nRet )
 										Set nivTotalStaff = nivTotalStaff + 1
-									Call SetStaffMembersSignature( 0, "" )
+									Call SetStaffMembersSignature( ncSIG_RESET_INIT, "" )
 									Set bReturn = TRUE
 								Call LoadStaffMembersFromTemplate(  )
 							Return bReturn
@@ -2069,7 +2081,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 					!
 					Date/Time: dtivStartDateCommits		! Manual set in project revisions tab
 					Date/Time: dtivSnapshotDate			! Set by the snapshot dialog
-					Boolean: bivSnapshotIsCreated		! Snapshot already done for this project?
+					Boolean: bivSnapshotIsCreated			! Snapshot already done for this project?
 					Boolean: bivSnapshotModeEnabled		! Snapshot already done for this project?
 				Constructor/Destructor
 				Functions
@@ -2145,7 +2157,8 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 							If nivTotalRevisions > 0
 								Call guGlobals.SetStatusTextSection( "Project: " || sivProjectCode )
 								If bivSnapshotIsCreated
-									Call guGlobals.Trace( EVENT_INFORMATION, "Snapshot already created for project: " || sivProjectCode )
+									! Hmmm, too much spam in log? Disable this trace
+									! Call guGlobals.Trace( EVENT_INFORMATION, "Snapshot already created for project: " || sivProjectCode )
 									Return TRUE
 								Else
 									Call guGlobals.Trace( EVENT_INFORMATION, "Start creating snapshot for project: " || sivProjectCode )
@@ -2603,7 +2616,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 						Description: Boolean __ConstructDeltaMasterFile( pnRevisionIndex, puRevisionDelta )
 								Constructs the original file based on the master/delta revisions.
 								
-								Parameter	Type			Description
+								Parameter		Type			Description
 								pnRevisionIndex	Number			Starting index position of the revision to reconstruct
 								puRevisionDelta	cfcTMProjectModuleRevision	The revision to reconstruct
 								
@@ -2617,14 +2630,14 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 								Class: cfcTMProjectModuleRevision
 						Static Variables
 						Local variables
-							Number: nMasterIndex
-							Boolean: bMasterFound
-							Number: nCount
-							Number: nModuleID
 							FunctionalVar: uRevisionPrev
 								Class: cfcTMProjectModuleRevision
 							FunctionalVar: uRevisionMaster
 								Class: cfcTMProjectModuleRevision
+							Number: nMasterIndex
+							Boolean: bMasterFound
+							Number: nCount
+							Number: nModuleID
 							String: sMasterFile
 							String: sDeltaFile
 							String: sTargetFile
@@ -2818,23 +2831,23 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 						Local variables
 						Actions
 							Select Case pnMode
-								Case 0		! Reset
+								Case ncSIG_RESET_INIT
 									Set sivExportName = sivFullName
 									Set sivExportEmail = ""
 									Break
-								Case 1		! CodeToName
+								Case ncSIG_CODE2NAME
 									If NOT sivExportName
 										Set sivExportName = sivStaffCode
 									Break
-								Case 2		! Force email
+								Case ncSIG_FORCE_EMAIL
 									If NOT sivExportEmail
 										Set sivExportEmail = psEmailBase
 									Break
-								Case 3		! Code to email
+								Case ncSIG_CODE2EMAIL
 									If NOT sivExportEmail
 										Set sivExportEmail = sivStaffCode || psEmailBase
 									Break
-								Case 4		! NameToEmail
+								Case ncSIG_NAME2EMAIL
 									If sivExportName
 										Set sivExportEmail = VisStrSubstitute( sivExportName, " ", "" ) || psEmailBase
 									Break
@@ -4553,6 +4566,20 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 						Call OpenTempFolder( )
 					Menu Item Name:
 				Menu Separator
+				Menu Item: menuGitHub
+					Resource Id: 40660
+					Title: Tom2Git GitHub Page
+					Picture File Name: .\Resources\github.png
+					Status Text:
+					ToolTip:
+					Keyboard Accelerator: (none)
+					Menu Settings
+						Enabled when:
+						Checked when:
+					Menu Actions
+						Call OpenGitHubPage( )
+					Menu Item Name:
+				Menu Separator
 				Menu Item: menuDonate
 					Resource Id: 29293
 					Title: Make a donation
@@ -5429,7 +5456,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 				Text Color: Class Default
 				Background Color: Class Default
 				Input Mask: Class Default
-				ToolTip:
+				ToolTip: Configure Project level folder
 				AutoFill? Class Default
 				XAML Style:
 				Background Brush:
@@ -5458,7 +5485,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 						Top: 0.81"
 						Width:  18.117"
 						Width Editable? Yes
-						Height: 2.631"
+						Height: 2.857"
 						Height Editable? Yes
 					Visible? Yes
 					Font Name: Default
@@ -6155,7 +6182,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 				Minimum Height: Default
 				Message Actions
 					On SAM_Click
-						Call guRepo.SetStaffMembersSignature( 0, dfEmailSpec )
+						Call guRepo.SetStaffMembersSignature( ncSIG_RESET_INIT, dfEmailSpec )
 						Call tblTeamMembers.Refresh(  )
 			Pushbutton: pbLoadMembersTemplate
 				Class Child Ref Key: 0
@@ -6249,7 +6276,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 						Top: 0.81"
 						Width:  8.467"
 						Width Editable? Yes
-						Height: 2.631"
+						Height: 2.833"
 						Height Editable? Yes
 					Visible? Yes
 					Font Name: Default
@@ -6573,7 +6600,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 				Minimum Height: Default
 				Message Actions
 					On SAM_Click
-						Call guRepo.SetStaffMembersSignature( 1, dfEmailSpec )
+						Call guRepo.SetStaffMembersSignature( ncSIG_CODE2NAME, dfEmailSpec )
 						Call tblTeamMembers.Refresh(  )
 			Group Box: grp3
 				Resource Id: 19380
@@ -6642,7 +6669,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 				Minimum Height: Default
 				Message Actions
 					On SAM_Click
-						Call guRepo.SetStaffMembersSignature( 4, dfEmailSpec )
+						Call guRepo.SetStaffMembersSignature( ncSIG_NAME2EMAIL, dfEmailSpec )
 						Call tblTeamMembers.Refresh(  )
 			Pushbutton: pbSetCodesToEmail
 				Class Child Ref Key: 0
@@ -6682,7 +6709,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 				Minimum Height: Default
 				Message Actions
 					On SAM_Click
-						Call guRepo.SetStaffMembersSignature( 3, dfEmailSpec )
+						Call guRepo.SetStaffMembersSignature( ncSIG_CODE2EMAIL, dfEmailSpec )
 						Call tblTeamMembers.Refresh(  )
 			Pushbutton: pbForceCustomEmail
 				Class Child Ref Key: 0
@@ -6722,7 +6749,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 				Minimum Height: Default
 				Message Actions
 					On SAM_Click
-						Call guRepo.SetStaffMembersSignature( 2, dfEmailSpec )
+						Call guRepo.SetStaffMembersSignature( ncSIG_FORCE_EMAIL, dfEmailSpec )
 						Call tblTeamMembers.Refresh(  )
 			Background Text: bkgdEmailBase
 				Resource Id: 19381
@@ -9246,7 +9273,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 						Top: 4.702"
 						Width:  18.117"
 						Width Editable? Yes
-						Height: 2.929"
+						Height: 2.857"
 						Height Editable? Yes
 					Visible? Yes
 					Font Name: Default
@@ -9358,6 +9385,43 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 						Data Type: String
 						Justify: Center
 						Width:  0.583"
+						Width Editable? Yes
+						Format: Unformatted
+						Country: Default
+						Input Mask: Unformatted
+						Cell Options
+							Cell Type? Standard
+							Multiline Cell? No
+							Cell DropDownList
+								Sorted? Yes
+								Vertical Scroll? Yes
+								Auto Drop Down? No
+								Allow Text Editing? Yes
+							Cell CheckBox
+								Check Value:
+								Uncheck Value:
+								Ignore Case? Yes
+						ToolTip:
+						Column Aggregate Type: None
+						Flow Direction: Default
+						Allow Text Filter: No
+						IME Mode: Auto
+						Always Show Drop Button? No
+						List Values
+						Message Actions
+					Column: colIsCompressed
+						Class Child Ref Key: 0
+						Class ChildKey: 0
+						Class:
+						Property Template:
+						Class DLL Name:
+						Title: Compressed
+						Visible? Yes
+						Editable? No
+						Maximum Data Length: Default
+						Data Type: String
+						Justify: Center
+						Width:  1.217"
 						Width Editable? Yes
 						Format: Unformatted
 						Country: Default
@@ -9631,6 +9695,8 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 								Set colRevisionDate	= puProject.uaivRevision[nCount].dtivRevisionDateTime
 								If puProject.uaivRevision[nCount].bivIsDelta
 									Set colIsDelta		= "Yes"
+								If puProject.uaivRevision[nCount].bivIsCompressed
+									Set colIsCompressed	= "Yes"
 								Set colFileName		= puProject.uaivRevision[nCount].sivFileName
 								Set colModifiedBy		= puProject.uaivRevision[nCount].sivModifiedBy
 								Set colStaffMember		= puProject.uaivRevision[nCount].sivStaffMember
@@ -9880,6 +9946,14 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 					Call PALPathAddBackslash( sTempFolder )
 					Set sPathParam = "/open,\"" || sTempFolder || "\""
 					Call ShellExecuteA( hWndNULL, "open" , "explorer.exe", sPathParam, STRING_Null, SHOW_Normal )
+			Function: OpenGitHubPage
+				Description:
+				Returns
+				Parameters
+				Static Variables
+				Local variables
+				Actions
+					Call ShellExecuteA( hWndNULL, "open" , "https://github.com/TD-Community/Tom2Git", STRING_Null, STRING_Null, SHOW_Normal )
 			Function: OpenTemplatesFolder
 				Description:
 				Returns
@@ -10790,6 +10864,7 @@ Application Description: Tom2Git - Export TOM repository projects to GIT.
 					Else
 						Call SalSetFocus( pbOk )
 					Call SalCenterWindow( hWndForm )
+					Call SalSetDefButton( pbOk )
 			Function: Login
 				Description: void Login( )
 						Execute login
